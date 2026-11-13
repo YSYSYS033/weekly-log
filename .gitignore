@@ -1,0 +1,30 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# ---- 虚拟环境 ----
+.venv/
+venv/
+
+# ---- 测试 / 检查缓存 ----
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- 本地数据 ----
+.weekly-log.json
+*.local.json
+
+# ---- 密钥 ----
+.env
+.env.*
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
