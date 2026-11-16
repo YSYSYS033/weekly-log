@@ -1,9 +1,12 @@
-"""cli.py 的冒烟测试：今天只验证命令行骨架能跑通。"""
+"""cli.py 的测试：命令行骨架 + add/list 真读写。"""
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
+from weekly_log import storage
 from weekly_log.cli import build_parser, main
 
 
@@ -41,3 +44,22 @@ def test_list_parses_week_flag() -> None:
 
     assert args.command == "list"
     assert args.week is True
+
+
+def test_add_then_list(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """连着 add 两条，list 应该能看到这两条。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+
+    assert main(["add", "学 FastAPI", "-m", "30"]) == 0
+    assert main(["add", "写测试", "-m", "15"]) == 0
+    capsys.readouterr()  # 清掉 add 的输出
+
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "学 FastAPI" in out
+    assert "写测试" in out
+    assert "共 2 条" in out

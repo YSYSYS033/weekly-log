@@ -1,13 +1,13 @@
-"""weekly-log 的命令行入口。
-
-今天是 W1-D1：先把 argparse 的骨架和 --help 跑通。
-真正的读写逻辑（Entry 模型 + JSON 持久化）在 W1-D2 补。
-"""
+"""weekly-log 的命令行入口。"""
 
 from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from datetime import date
+
+from weekly_log import storage
+from weekly_log.models import Entry
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,15 +34,38 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def cmd_add(args: argparse.Namespace) -> int:
-    """TODO(W1-D2): 写入 JSON 文件。"""
-    print(f"[TODO] add: title={args.title!r} minutes={args.minutes} date={args.date}")
+    """新增一条记录并立刻存盘。"""
+    entry = Entry(title=args.title, minutes=args.minutes, date=args.date or "")
+    entries = storage.load()
+    entries.append(entry)
+    path = storage.save(entries)
+    print(f"已记录：{entry.date}  {entry.minutes} 分钟  {entry.title}")
+    print(f"（保存在 {path}）")
     return 0
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    """TODO(W1-D2): 从 JSON 文件读取并打印。"""
-    print(f"[TODO] list: week_only={args.week}")
+    """列出记录，可选只看本周。"""
+    entries = storage.load()
+    if args.week:
+        entries = [entry for entry in entries if _is_this_week(entry.date)]
+    if not entries:
+        print("还没有记录，先用 add 加一条吧")
+        return 0
+    for entry in entries:
+        print(f"{entry.date}  {entry.minutes:>4} 分钟  {entry.title}")
+    total = sum(entry.minutes for entry in entries)
+    print(f"\n共 {len(entries)} 条，合计 {total} 分钟")
     return 0
+
+
+def _is_this_week(day: str) -> bool:
+    """判断某个日期是否落在本周（周一到周日）。"""
+    try:
+        parsed = date.fromisoformat(day)
+    except ValueError:
+        return False
+    return parsed.isocalendar()[:2] == date.today().isocalendar()[:2]
 
 
 def main(argv: Sequence[str] | None = None) -> int:

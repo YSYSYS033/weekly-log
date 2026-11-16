@@ -1,4 +1,4 @@
-# weekly-log
+﻿# weekly-log
 
 > 一个命令行小工具：记录每天学了什么、花了多久，按周汇总。
 > W1 练手项目，用来把「工程化 + Git + 测试 + 打包」这套动作跑一遍。
@@ -19,7 +19,7 @@ uv run weekly-log list
 uv run weekly-log list --week
 ```
 
-> 目前 `add` / `list` 只有命令行骨架，真正读写 JSON 在 W1-D2 实现。
+> 记录保存在用户目录的 `.weekly-log.json`（Windows 上是 `C:\Users\<你的用户名>\`），可以直接用文本编辑器打开看。
 
 ## 开发
 
@@ -44,7 +44,7 @@ weekly-log/
 ## W1 路线图
 
 - [x] D1：项目骨架、依赖、命令行骨架、`--help` 可跑
-- [ ] D2：`Entry` 数据模型 + JSON 持久化 + `add` / `list`
+- [x] D2：`Entry` 数据模型 + JSON 持久化 + `add` / `list`
 - [ ] D3：`update` / `delete` / `search` + 参数校验 + 6 个测试
 - [ ] D4：分支 + 3 个 PR
 - [ ] D5：FastAPI `/health`
