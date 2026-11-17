@@ -46,6 +46,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_search.add_argument("keyword", help="关键词（不区分大小写）")
     p_search.set_defaults(func=cmd_search)
 
+    p_stats = sub.add_parser("stats", help="统计概览")
+    p_stats.set_defaults(func=cmd_stats)
+
     return parser
 
 
@@ -155,6 +158,18 @@ def _is_this_week(day: str) -> bool:
     except ValueError:
         return False
     return parsed.isocalendar()[:2] == date.today().isocalendar()[:2]
+
+
+def cmd_stats(args: argparse.Namespace) -> int:
+    """打印总量和本周的统计。"""
+    entries = storage.load()
+    this_week = [entry for entry in entries if _is_this_week(entry.date)]
+    total_minutes = sum(entry.minutes for entry in entries)
+    week_minutes = sum(entry.minutes for entry in this_week)
+
+    print(f"总记录：{len(entries)} 条，合计 {total_minutes} 分钟")
+    print(f"本周：  {len(this_week)} 条，合计 {week_minutes} 分钟")
+    return 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:

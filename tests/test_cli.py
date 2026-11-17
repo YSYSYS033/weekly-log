@@ -152,3 +152,21 @@ def test_search_finds_keyword(
     assert "学 FastAPI" in out
     assert "写 pytest 测试" not in out
     assert "共找到 1 条" in out
+
+
+def test_stats_shows_totals(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """stats 应该给出总条数、总分钟和本周数据。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "学 FastAPI", "-m", "30"]) == 0
+    assert main(["add", "写测试", "-m", "20"]) == 0
+    capsys.readouterr()
+
+    assert main(["stats"]) == 0
+    out = capsys.readouterr().out
+    assert "总记录：2 条" in out
+    assert "合计 50 分钟" in out
+    assert "本周" in out
