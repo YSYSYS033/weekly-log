@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 from datetime import date
@@ -29,6 +30,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="列出记录")
     p_list.add_argument("--week", action="store_true", help="只看本周")
+    p_list.add_argument("--json", action="store_true", help="以 JSON 格式输出")
     p_list.set_defaults(func=cmd_list)
 
     p_update = sub.add_parser("update", help="修改一条记录")
@@ -90,6 +92,9 @@ def cmd_list(args: argparse.Namespace) -> int:
         entries = [entry for entry in entries if _is_this_week(entry.date)]
     if not entries:
         print("还没有记录，先用 add 加一条吧")
+        return 0
+    if args.json:
+        print(json.dumps([entry.to_dict() for entry in entries], ensure_ascii=False, indent=2))
         return 0
     for entry in entries:
         print(_format(entry))
