@@ -189,3 +189,22 @@ def test_list_json_output(
     assert len(data) == 1
     assert data[0]["title"] == "学 FastAPI"
     assert data[0]["minutes"] == 30
+
+
+def test_list_limit_shows_latest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """list -n 2 只显示最近两条。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "第一条", "-m", "10"]) == 0
+    assert main(["add", "第二条", "-m", "20"]) == 0
+    assert main(["add", "第三条", "-m", "30"]) == 0
+    capsys.readouterr()
+
+    assert main(["list", "-n", "2"]) == 0
+    out = capsys.readouterr().out
+    assert "第一条" not in out
+    assert "第二条" in out
+    assert "第三条" in out

@@ -31,6 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_list = sub.add_parser("list", help="列出记录")
     p_list.add_argument("--week", action="store_true", help="只看本周")
     p_list.add_argument("--json", action="store_true", help="以 JSON 格式输出")
+    p_list.add_argument("-n", "--limit", type=int, default=0, help="只显示最近 N 条（0=全部）")
     p_list.set_defaults(func=cmd_list)
 
     p_update = sub.add_parser("update", help="修改一条记录")
@@ -90,6 +91,8 @@ def cmd_list(args: argparse.Namespace) -> int:
     entries = storage.load()
     if args.week:
         entries = [entry for entry in entries if _is_this_week(entry.date)]
+    if args.limit > 0:
+        entries = entries[-args.limit:]
     if not entries:
         print("还没有记录，先用 add 加一条吧")
         return 0
