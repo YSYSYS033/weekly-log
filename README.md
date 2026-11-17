@@ -20,6 +20,7 @@ uv run weekly-log list --week
 uv run weekly-log update --id 1 -m 90
 uv run weekly-log delete --id 2
 uv run weekly-log search fastapi
+uv run weekly-log stats
 ```
 
 > 记录保存在用户目录的 `.weekly-log.json`（Windows 上是 `C:\Users\<你的用户名>\`），可以直接用文本编辑器打开看。
