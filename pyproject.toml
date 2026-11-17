@@ -1,6 +1,6 @@
-[project]
+﻿[project]
 name = "weekly-log"
-version = "0.1.0"
+version = "0.2.0"
 description = "Weekly log CLI: 记录每天学了什么、花了多久"
 readme = "README.md"
 requires-python = ">=3.12"

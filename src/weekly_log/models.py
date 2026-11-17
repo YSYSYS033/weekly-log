@@ -13,6 +13,7 @@ class Entry:
     title: str
     minutes: int = 0
     date: str = ""
+    id: int = 0
 
     def __post_init__(self) -> None:
         """创建对象后自动执行的校验。"""
@@ -29,9 +30,10 @@ class Entry:
 
     @classmethod
     def from_dict(cls, data: dict) -> Entry:
-        """从字典还原成 Entry。"""
+        """从字典还原成 Entry（老数据没有 id 字段时默认为 0）。"""
         return cls(
             title=data["title"],
             minutes=int(data.get("minutes", 0)),
             date=data.get("date", ""),
+            id=int(data.get("id", 0)),
         )

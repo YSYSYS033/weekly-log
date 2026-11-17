@@ -1,4 +1,4 @@
-﻿# weekly-log
+# weekly-log
 
 > 一个命令行小工具：记录每天学了什么、花了多久，按周汇总。
 > W1 练手项目，用来把「工程化 + Git + 测试 + 打包」这套动作跑一遍。
@@ -17,6 +17,9 @@ uv run weekly-log --help
 uv run weekly-log add "学 FastAPI 路由" -m 60
 uv run weekly-log list
 uv run weekly-log list --week
+uv run weekly-log update --id 1 -m 90
+uv run weekly-log delete --id 2
+uv run weekly-log search fastapi
 ```
 
 > 记录保存在用户目录的 `.weekly-log.json`（Windows 上是 `C:\Users\<你的用户名>\`），可以直接用文本编辑器打开看。
@@ -45,7 +48,7 @@ weekly-log/
 
 - [x] D1：项目骨架、依赖、命令行骨架、`--help` 可跑
 - [x] D2：`Entry` 数据模型 + JSON 持久化 + `add` / `list`
-- [ ] D3：`update` / `delete` / `search` + 参数校验 + 6 个测试
+- [x] D3：`update` / `delete` / `search` + 参数校验 + 14 个测试
 - [ ] D4：分支 + 3 个 PR
 - [ ] D5：FastAPI `/health`
 - [ ] D6：重构 + 8 个测试 + README

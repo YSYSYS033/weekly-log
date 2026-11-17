@@ -1,4 +1,4 @@
-"""cli.py 的测试：命令行骨架 + add/list 真读写。"""
+"""cli.py 的测试：命令行骨架 + add/list/update/delete/search。"""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ def test_help_exits_zero(capsys: pytest.CaptureFixture[str]) -> None:
     assert exc.value.code == 0
     out = capsys.readouterr().out
     assert "weekly-log" in out
-    assert "add" in out
-    assert "list" in out
+    for command in ("add", "list", "update", "delete", "search"):
+        assert command in out
 
 
 def test_no_args_prints_help(capsys: pytest.CaptureFixture[str]) -> None:
@@ -63,3 +63,92 @@ def test_add_then_list(
     assert "学 FastAPI" in out
     assert "写测试" in out
     assert "共 2 条" in out
+
+
+def test_add_rejects_empty_title(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """空标题应该被拒绝，并且返回非 0 退出码。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+
+    assert main(["add", "   "]) == 1
+    assert "标题不能为空" in capsys.readouterr().err
+
+
+def test_update_changes_minutes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """update 能按编号改掉分钟数。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "学 FastAPI", "-m", "30"]) == 0
+    capsys.readouterr()
+
+    assert main(["update", "--id", "1", "-m", "90"]) == 0
+    out = capsys.readouterr().out
+    assert "90 分钟" in out
+
+
+def test_update_unknown_id_returns_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """改一个不存在的编号要报错。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+
+    assert main(["update", "--id", "99", "-m", "10"]) == 1
+    assert "没有编号为 99" in capsys.readouterr().err
+
+
+def test_delete_removes_entry(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """delete 之后 list 里就不该有这条了。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "要删的", "-m", "10"]) == 0
+    assert main(["add", "要留的", "-m", "20"]) == 0
+    capsys.readouterr()
+
+    assert main(["delete", "--id", "1"]) == 0
+    capsys.readouterr()
+
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "要删的" not in out
+    assert "要留的" in out
+
+
+def test_delete_unknown_id_returns_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """删一个不存在的编号要报错。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+
+    assert main(["delete", "--id", "99"]) == 1
+    assert "没有编号为 99" in capsys.readouterr().err
+
+
+def test_search_finds_keyword(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """search 只返回标题里包含关键词的记录。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "学 FastAPI", "-m", "30"]) == 0
+    assert main(["add", "写 pytest 测试", "-m", "20"]) == 0
+    capsys.readouterr()
+
+    assert main(["search", "fastapi"]) == 0
+    out = capsys.readouterr().out
+    assert "学 FastAPI" in out
+    assert "写 pytest 测试" not in out
+    assert "共找到 1 条" in out
