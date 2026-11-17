@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -170,3 +171,21 @@ def test_stats_shows_totals(
     assert "总记录：2 条" in out
     assert "合计 50 分钟" in out
     assert "本周" in out
+
+
+def test_list_json_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """list --json 输出合法 JSON，字段和条数都正确。"""
+    monkeypatch.setattr(storage, "DEFAULT_PATH", tmp_path / "data.json")
+    assert main(["add", "学 FastAPI", "-m", "30"]) == 0
+    capsys.readouterr()
+
+    assert main(["list", "--json"]) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert len(data) == 1
+    assert data[0]["title"] == "学 FastAPI"
+    assert data[0]["minutes"] == 30
