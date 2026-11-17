@@ -18,6 +18,7 @@ uv run weekly-log add "学 FastAPI 路由" -m 60
 uv run weekly-log list
 uv run weekly-log list --week
 uv run weekly-log list --json
+uv run weekly-log list -n 5
 uv run weekly-log update --id 1 -m 90
 uv run weekly-log delete --id 2
 uv run weekly-log search fastapi
