@@ -4,7 +4,10 @@ version = "0.2.0"
 description = "Weekly log CLI: 记录每天学了什么、花了多久"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.165.0",
+    "uvicorn>=0.54.0",
+]
 
 [project.scripts]
 weekly-log = "weekly_log.cli:main"
@@ -15,6 +18,8 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
+    "httpx2>=2.16.2",
     "pytest>=9.2.0",
     "ruff>=0.17.5",
 ]
@@ -32,3 +37,4 @@ known-first-party = ["weekly_log"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+pythonpath = ["."]
