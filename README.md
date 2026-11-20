@@ -35,6 +35,17 @@ uv run ruff check .    # 代码检查
 uv run ruff format .   # 自动格式化
 ```
 
+## API 服务
+
+```powershell
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+启动后打开：
+
+- http://127.0.0.1:8000/health → `{"status":"ok"}`
+- http://127.0.0.1:8000/docs → 自动生成的接口文档（Swagger）
+
 ## 目录结构
 
 ```
