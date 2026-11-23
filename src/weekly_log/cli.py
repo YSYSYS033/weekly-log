@@ -92,7 +92,7 @@ def cmd_list(args: argparse.Namespace) -> int:
     if args.week:
         entries = [entry for entry in entries if _is_this_week(entry.date)]
     if args.limit > 0:
-        entries = entries[-args.limit:]
+        entries = entries[-args.limit :]
     if not entries:
         print("还没有记录，先用 add 加一条吧")
         return 0
